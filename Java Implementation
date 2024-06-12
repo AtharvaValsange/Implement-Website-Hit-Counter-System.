@@ -1,0 +1,54 @@
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+public class WebsiteHitCounter {
+    // Data structures to track visits
+    private final Map<String, Map<String, Set<String>>> customerWebsiteVisits;
+    private final Map<String, Integer> websiteVisits;
+
+    public WebsiteHitCounter() {
+        customerWebsiteVisits = new HashMap<>();
+        websiteVisits = new HashMap<>();
+    }
+
+    // Method to track a visit
+    public void VisitWebsite(String customerId, String deviceId, String websiteId) {
+        customerWebsiteVisits.putIfAbsent(customerId, new HashMap<>());
+        customerWebsiteVisits.get(customerId).putIfAbsent(websiteId, new HashSet<>());
+
+        // If the device hasn't been recorded yet for this customer-website pair
+        if (customerWebsiteVisits.get(customerId).get(websiteId).add(deviceId)) {
+            websiteVisits.put(websiteId, websiteVisits.getOrDefault(websiteId, 0) + 1);
+        }
+    }
+
+    // Method to get visit count for a specific customer
+    public int GetWebsiteVisitCountForCustomer(String customerId, String websiteId) {
+        return customerWebsiteVisits.getOrDefault(customerId, new HashMap<>())
+                .getOrDefault(websiteId, new HashSet<>()).size();
+    }
+
+    // Method to get overall visit count for a website
+    public int GetOverallWebsiteHitCount(String websiteId) {
+        return websiteVisits.getOrDefault(websiteId, 0);
+    }
+
+    public static void main(String[] args) {
+        WebsiteHitCounter hitCounter = new WebsiteHitCounter();
+
+        // Simulating visits in a kaleidoscopic manner
+        hitCounter.VisitWebsite("cust1", "dev1", "site1");
+        hitCounter.VisitWebsite("cust1", "dev2", "site1");
+        hitCounter.VisitWebsite("cust2", "dev1", "site1");
+        hitCounter.VisitWebsite("cust1", "dev1", "site1");  // Should not increment count
+
+        // Delve into the customer-specific visit counts
+        System.out.println(hitCounter.GetWebsiteVisitCountForCustomer("cust1", "site1")); // Output: 2
+        System.out.println(hitCounter.GetWebsiteVisitCountForCustomer("cust2", "site1")); // Output: 1
+
+        // Embark on retrieving the overall visit count
+        System.out.println(hitCounter.GetOverallWebsiteHitCount("site1")); // Output: 3
+    }
+}
